@@ -114,11 +114,7 @@ class ServiceNowAdapter extends EventEmitter {
           * healthcheck(), execute it passing the error seen as an argument
           * for the callback's errorMessage parameter.
           */
-          log.error("ERROR: " + this.id + " " +  error);
           this.emitOffline();
-          if (callback != null){
-              return callback(error);
-          }
        } else {
          /**
           * Write this block.
