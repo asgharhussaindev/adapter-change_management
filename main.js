@@ -139,7 +139,7 @@ class ServiceNowAdapter extends EventEmitter {
           * responseData parameter.
           */
           log.info("INFO: healthCheck(): Should emitonline now");
-          this.emitOnline()
+          this.emitOnline();
        }
      })
      log.info("INFO: healthcheck(): Exit");
