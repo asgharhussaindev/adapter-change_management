@@ -98,14 +98,9 @@ class ServiceNowConnector {
      * This function must not check for a hibernating instance;
      * it must call function isHibernating.
      */
-
-     //console.log("DEBUG: processRequestResults(): error = " + error);
-     //console.log("DEBUG: processRequestResults(): response = " + response);
-     //console.log("DEBUG: processRequestResults(): body = " + body);
-     //console.log("DEBUG: processRequestResults(): callback = " + callback);
-     //console.log("DEBUG: processRequestResults(): typeof callback = " + typeof callback);
-
+     log.info("INFO: processRequestResults(): Enter");
      if (error != null){
+    
        //console.log("DEBUG: processRequestResults: error is not null");
        return callback(response, error);
      }
@@ -116,6 +111,7 @@ class ServiceNowConnector {
        return callback(null, "Instance is hibernating")
      }
 
+     log.info("INFO: processRequestResults(): Exit");
      return callback(response, error)
   }
 
@@ -161,7 +157,21 @@ class ServiceNowConnector {
     request(requestOptions, (error, response, body) => {
       this.processRequestResults(error, response, body, 
         (processedResults, processedError) => callback(processedResults, processedError));
+      if (error) { 
+          log.error("ERROR: sendRequest(): error = " + error);
+          return callback(null, response);
+      }  
+
+      if (response) {
+          log.info("INFO: sendRequest(): response = " + response);
+      }  
+
+      if (body) {
+          log.info("INFO: sendRequest(): body = " + body);
+      }
+      return callback(response, error);
     });
+
   }
 
   /**
@@ -179,10 +189,27 @@ class ServiceNowConnector {
    * @param {error} callback.error - The error property of callback.
    */
   get(callback) {
-    let getCallOptions = { ...this.options };
+    log.info("INFO: get(): Enter");
+    let getCallOptions = { ...this.options};
+    log.info("INFO: get(): getCallOptions = " + getCallOptions);
     getCallOptions.method = 'GET';
     getCallOptions.query = 'sysparm_limit=1';
-    this.sendRequest(getCallOptions, (results, error) => callback(results, error));
+    //this.sendRequest(getCallOptions, (results, error) => callback(results, error));
+    this.sendRequest(getCallOptions, 
+      function(results, error){
+          if (results){
+              log.info("INFO: connector.js->get(): results " + results);
+          }
+
+          if (error){
+              log.error("ERROR: connector.js->get(): error " + error);
+              return callback(null, error);
+          }
+          return callback(results, error);
+      }  
+    )
+
+    log.info("INFO: get(): Exit");
   }
 
   /**
