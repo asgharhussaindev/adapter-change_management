@@ -66,6 +66,8 @@ class ServiceNowAdapter extends EventEmitter {
       password: this.props.auth.password,
       serviceNowTable: this.props.serviceNowTable
     });
+
+    log.info("INFO: connector = " + this.connector);
   }
 
   /**
@@ -80,7 +82,9 @@ class ServiceNowAdapter extends EventEmitter {
   connect() {
     // As a best practice, Itential recommends isolating the health check action
     // in its own method.
+    log.info("INFO: connect(): Enter");
     this.healthcheck();
+    log.info("INFO: connect(): Exit");
   }
 
   /**
@@ -94,6 +98,10 @@ class ServiceNowAdapter extends EventEmitter {
    *   that handles the response.
    */
   healthcheck(callback) {
+    log.info("INFO: healthcheck(): Enter");
+    //this.emitOnline();
+    log.info("INFO: healthcheck(): Exit");
+    //log.info("INFO: healthcheck(): Enter");
     this.getRecord((result, error) => {
       /**
        * For this lab, complete the if else conditional
@@ -114,7 +122,11 @@ class ServiceNowAdapter extends EventEmitter {
           * healthcheck(), execute it passing the error seen as an argument
           * for the callback's errorMessage parameter.
           */
+          log.error("ERROR: " + this.id + " " +  error);
           this.emitOffline();
+          if (callback != null){
+            return callback(error);
+          }
        } else {
          /**
           * Write this block.
@@ -126,9 +138,11 @@ class ServiceNowAdapter extends EventEmitter {
           * parameter as an argument for the callback function's
           * responseData parameter.
           */
-          this.emitOnline()
+          log.info("INFO: healthCheck(): Should emitonline now");
+          this.emitOnline();
        }
-     });
+     })
+     log.info("INFO: healthcheck(): Exit");
   }
 
   /**
@@ -165,7 +179,9 @@ class ServiceNowAdapter extends EventEmitter {
    * @param {string} status - The event to emit.
    */
   emitStatus(status) {
+    log.info("INFO: emitStatus(): Enter");
     this.emit(status, { id: this.id });
+    log.info("INFO: emitStatus(): Exit");
   }
 
   /**
@@ -184,14 +200,18 @@ class ServiceNowAdapter extends EventEmitter {
      * Note how the object was instantiated in the constructor().
      * get() takes a callback function.
      */
-     this.get(
+     log.info("INFO: getRecord(): Enter");
+     this.connector.get(
        function(data, error){
          if (error) {
-           console.log("error = " + error)
+           log.error("ERROR: main.js->getRecord(): error = " + error);
+           return callback(null, error);
          }
-         console.log("data = " + data)
+         log.info("INFO: main.js->getRecord(): data = " + data);
+         return callback(data, error);
        }
      );
+     log.info("INFO: getRecord(): Exit");
   }
 
   /**
@@ -210,14 +230,18 @@ class ServiceNowAdapter extends EventEmitter {
      * Note how the object was instantiated in the constructor().
      * post() takes a callback function.
      */
-     this.post(
+     log.info("INFO: postRecord(): Enter");
+     this.connector.post(
        function(data, error){
          if (error) {
-           console.log("error = " + error)
+           log.error("ERROR: main.js->postRecord(): error = " + error);
+           return callback(null, error);
          }
-         console.log("data = " + data)
+         log.info("INFO: main.js->postRecord(): data = " + data);
+         return callback(data, error);
        }
      );
+     log.info("INFO: postRecord(): Exit");
   }
 }
 
